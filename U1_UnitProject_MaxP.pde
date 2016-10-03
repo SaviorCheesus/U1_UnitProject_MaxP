@@ -1,17 +1,26 @@
 float speed = 8;
 float x = 0.0;
 float y = 0.0;
-int shooting = 0;
-float bulletX = 0;
-float bulletY = 0;
-int angle = 0;
-float bulletSpeed = 20;
 
+float bulletX[];
+float bulletY[];
+float bulletAngle[];
+boolean bulletIsActive[];
+int playerAngle = 0;
+int nextBullet = 0;
 
+int block1 = 0;
+int block2 = 0;
+int block3 = 0;
+int block4 = 0;
 
 void setup()
 {
   fullScreen(P2D); //Screen size (P2D to increase speed)
+  bulletX = new float[10];
+  bulletY = new float[10];
+  bulletAngle = new float[10];
+  bulletIsActive = new boolean[10];
 }
 
 void draw()
@@ -27,6 +36,7 @@ void draw()
   
   character();
   shooting();
+
 }
 
 void startText()
@@ -48,87 +58,86 @@ void character()
   rect((width/2)-10 , (height/2)-10,20,20);
   
   if (keyPressed == true)
-  {
-    if (key == 'w')
-  {
-    y = y + speed;
-    angle = 1;
-  }
-  if (key == 'd')
-  {
-    x = x - speed;
-    angle = 2;
-  }
-  if (key == 's')
-  {
-    y = y - speed;
-    angle = 3;
-  }
-  if (key == 'a')
-  {
-    x = x + speed;
-    angle = 4;
-  }
-  }
+   {
+   if (key == 'w')
+      {
+      y = y + speed;
+      playerAngle = 0;
+      }
+      if (key == 'd')
+      {
+      x = x - speed;
+      playerAngle = 1;
+      }
+      if (key == 's')
+      {
+      y = y - speed;
+      playerAngle = 2;
+      }
+      if (key == 'a')
+      {
+      x = x + speed;
+      playerAngle = 3;
+      }
+    }
 }
+
 
 void shooting()
 {
-  if (keyCode == ' ' && shooting == 0)
+  for (int i = 0; i <10; i++)
   {
-    shooting = 1;
-
-  }
-
-  if (shooting == 1)
-  {
-    if (angle == 1)
+    if ( bulletIsActive[i] )
     {
-    rect ((width/2) + bulletX -5, (height/2) + bulletY -25, 10, 10); // Shoot topwards
-    bulletY = bulletY - 10;
+      rect(bulletX[i] -5, bulletY[i] -5, 10, 10);
+      if ( bulletAngle[i] == 0)
+      {
+        bulletY[i]-= 10;;
+      }
+      else if ( bulletAngle[i] == 1)
+      {
+        bulletX[i]+= 10;
+      }
+      else if ( bulletAngle[i] == 2)
+      {
+        bulletY[i]+= 10;
+      }
+      else if ( bulletAngle[i] == 3)
+      {
+        bulletX[i]-= 10;
+      }
     }
-    if (angle == 2)
+    
+    if ( key == ' ')
     {
-    rect ((width/2) + bulletX +15, (height/2) + bulletY -5,10 , 10); // Shoot rightwards
-    bulletX = bulletX + 10;
-    }
-    if (angle == 3)
+    bulletX[nextBullet] = width/2;
+    bulletY[nextBullet] = height/2;
+    bulletAngle[nextBullet] = playerAngle;
+    bulletIsActive[nextBullet] = true;
+    nextBullet++;
+    if ( nextBullet > 9)
     {
-    rect ((width/2) + bulletX -5, (height/2) + bulletY +15, 10 ,10); // Shoot bellowards
-    bulletY = bulletY + 10;
+      nextBullet = 0;
     }
-    if (angle == 4)
-    {
-    rect ((width/2) + bulletX -25, (height/2) + bulletY -5, 10, 10); // Shoots leftwards
-    bulletX = bulletX - 10;
-    }
-  else if (shooting == 0)
-  {
-    bulletX = 0;
-    bulletY = 0;
-  }
-  }
-  if (mousePressed == true);
-  {
-    shooting = 0;
   }
   
   fill (0);
-  if (angle == 1)
+  if (playerAngle == 0)
   {
     rect ((width/2) -5, (height/2) -25, 10, 10); // Put retical at the top
   }
-  if (angle == 2)
+  if (playerAngle == 1)
   {
     rect ((width/2) +15, (height/2) -5, 10, 10); // Put retical at the right
   }
-  if (angle == 3)
+  if (playerAngle == 2)
   {
     rect ((width/2) -5, (height/2) +15, 10, 10); // Put retical at the bottom
   }
-  if (angle == 4)
+  if (playerAngle == 3)
   {
     rect ((width/2) -25, (height/2) -5, 10, 10); // Put retical at the left
+  }
   }
 }
     
@@ -182,16 +191,17 @@ void corridor1()
   rect ((width/2) +40 + x, y - (height/2), 20, (height/2)); // Right wall 
 }
 
+
 void puzzleroom()
 {
   if (y + 20 -(height/2) -100 >= (height/2)-10 && y -(height/2) - 100 <= (height/2)-10 && 
-  x + (width/2) >= (width/2) && x -380 <= (width/2))
+  x + (width/2) -40>= (width/2) && x -380 <= (width/2))
   {
     y = y - speed;
   }
 
   if (y -(height/2) + 20 <= (height/2)+30 && y -(height/2) +40 >= (height/2)+30 &&
-  x + (width/2) >= (width/2) && x -380 <= (width/2))
+  x + (width/2) -40>= (width/2) && x -380 <= (width/2))
   {
     y = y + speed;
   }
@@ -222,23 +232,63 @@ void puzzleroom()
   rect (x - (width/2), y - height, (width/2), 20); // Top Wall
 
  
-  if (y -(height/4) + 20 <= (height/2)+30 )
+  if (y -(height/4) + 20 <= (height/2)+30 &&
+  x - (width/2) + (width/2) -40  >= (width/2) )
   {
     y = y + speed;
   }
-  rect (x -(width/2), y -(height/4), (width/2), 20); // Bottom wall
+  rect (x -(width/2), y -(height/4), (width/2), 20 ); // Bottom wall
+  
+  fill (22,130,196);
+  ellipse (x -(width/4), y - height + 100, 100, 100); //Switch 1
+  ellipse (x -(width/4), y - (height/2) + 150, 100, 100); //Switch 2
+  fill (181,208,224);
+  ellipse (x -(width/3) -150, y - (height/2) - 50, 100, 100); //Goal
+  
+  if (block1 == 0)
+  {
+    if (bulletY[nextBullet] <=  y - height + 100)
+    {
+     fill (222,0,0);
+     rect(x -(width/4)-50, y - (height/2) + 50, 100, 20);
+    }
+    else
+    {
+     fill (129,0,0);
+     rect(x -(width/4)-50, y - (height/2) + 50, 100, 20);
+    }
+  }
+  
+  if (block1 == 1)
+  {
+    if (bulletY[nextBullet] >=  y - height + 200)
+    {
+    fill (222,0,0);
+    rect(x -(width/4)-50, y - height + 200, 100, 20);
+    }
+    else
+    {
+    fill (129,0,0);
+    rect(x -(width/4)-50, y - height + 200, 100, 20);
+    }
+  }
+  fill (22,130,196);
+
+  
+  fill (255,108,108);
+  
 }
 
 void enemyroom()
 {
-  if (y + 20 -(height/2) -100 >= (height/2)-10 && y -(height/2) - 100 <= (height/2)-10 && 
-  x + width -40  >= (width/2) && +(width/2) + 40 <= (width/2))
+  if (y + 20 -(height/2) -60 >= (height/2)-10 && y -(height/2) - 60 <= (height/2)-10 && 
+  x + width + (height/2) -100 >= (width/2) && +(width/2) + 40 <= (width/2))
   {
     y = y - speed;
   }
 
   if (y -(height/2) + 20 <= (height/2)+30 && y -(height/2) +40 >= (height/2)+30 &&
-  x + width -40  >= (width/2) && x +(width/2) +40 <= (width/2))
+  x + width +(height/2) -100 >= (width/2) && x +(width/2) +40 <= (width/2))
   {
     y = y + speed;
   }
