@@ -12,7 +12,7 @@ int nextBullet = 0;
 int block1 = 0;
 int block2 = 0;
 int block3 = 0;
-int block4 = 0;
+int door = 0;
 
 void setup()
 {
@@ -32,7 +32,6 @@ void draw()
   room1();
   corridor1();
   puzzleroom();
-  enemyroom();
   
   character();
   shooting();
@@ -92,19 +91,19 @@ void shooting()
       rect(bulletX[i] -5, bulletY[i] -5, 10, 10);
       if ( bulletAngle[i] == 0)
       {
-        bulletY[i]-= 10;;
+        bulletY[i]-= speed;;
       }
       else if ( bulletAngle[i] == 1)
       {
-        bulletX[i]+= 10;
+        bulletX[i]+= speed;
       }
       else if ( bulletAngle[i] == 2)
       {
-        bulletY[i]+= 10;
+        bulletY[i]+= speed;
       }
       else if ( bulletAngle[i] == 3)
       {
-        bulletX[i]-= 10;
+        bulletX[i]-= speed;
       }
     }
     
@@ -177,18 +176,29 @@ void room1()
 void corridor1()
 {  
   if (x + (width/2) -40 >= (width/2)-10 && x + (width/2) -40 <= (width/2)+10 
-  && y - (height/2) <= (height/2)-10 && y >= (height/2)-10)
+  && y - (height/2) <= (height/2)-10 && y  >= (height/2)-10)
   {
     x = x - speed;
   }
  
   if ((width/2) +40 + x <= (width/2)+10 && (width/2) +40 + x >= (width/2)-10 
-  && y - (height/2) <= (height/2)-10 && y >= (height/2)-10)
+  && y - (height/2) -100 <= (height/2)-10 && y >= (height/2)-10)
   {
     x = x + speed;
   } 
   rect (x + (width/2) -60, y - (height/2), 20, (height/2));  // Left wall
-  rect ((width/2) +40 + x, y - (height/2), 20, (height/2)); // Right wall 
+  rect ((width/2) +40 + x, y - (height/2) - 100, 20, (height/2) + 100); // Right wall 
+  
+  if (door == 0)
+  {
+    if (y -(height/2) -70 >= (height/2) && x + (width/2) -60 <= (width/2) +10)
+    {
+    y = y - speed;
+    }
+    fill (0,242,151);
+    rect(x + (width/2) -40 , y -(height/2) -100, 100, 20);
+    fill (255,108,108);
+  }
 }
 
 
@@ -245,54 +255,40 @@ void puzzleroom()
   fill (181,208,224);
   ellipse (x -(width/3) -150, y - (height/2) - 50, 100, 100); //Goal
   
+  if (bulletX[nextBullet] >= x -(width/3) -100)
+  {
+    door = 1;
+  }
+  
   if (block1 == 0)
   {
     if (bulletY[nextBullet] <=  y - height + 100)
     {
-     fill (222,0,0);
-     rect(x -(width/4)-50, y - (height/2) + 50, 100, 20);
-    }
-    else
-    {
-     fill (129,0,0);
-     rect(x -(width/4)-50, y - (height/2) + 50, 100, 20);
-    }
-  }
-  
-  if (block1 == 1)
-  {
-    if (bulletY[nextBullet] >=  y - height + 200)
-    {
-    fill (222,0,0);
-    rect(x -(width/4)-50, y - height + 200, 100, 20);
+     fill (242,0,0);
+     block1 = 1;
     }
     else
     {
     fill (129,0,0);
-    rect(x -(width/4)-50, y - height + 200, 100, 20);
+    }
+    if (bulletY[nextBullet] >= y - (height/2) + 30)
+    {
+      bulletY[nextBullet] = bulletY[nextBullet] - speed;
     }
   }
-  fill (22,130,196);
+  rect(x -(width/4)-50, y - (height/2) + 50, 100, 20);
+           
+  if (block1 == 1)
+  {
+    if (bulletY[nextBullet] >= x -(width/4)-50)
+    {
 
-  
+    }
+    else
+    {
+    fill (129,0,0);
+    }
+  }
   fill (255,108,108);
   
-}
-
-void enemyroom()
-{
-  if (y + 20 -(height/2) -60 >= (height/2)-10 && y -(height/2) - 60 <= (height/2)-10 && 
-  x + width + (height/2) -100 >= (width/2) && +(width/2) + 40 <= (width/2))
-  {
-    y = y - speed;
-  }
-
-  if (y -(height/2) + 20 <= (height/2)+30 && y -(height/2) +40 >= (height/2)+30 &&
-  x + width +(height/2) -100 >= (width/2) && x +(width/2) +40 <= (width/2))
-  {
-    y = y + speed;
-  }
-  
-  rect (x +(width/2) +40, y -(height/2) -100, (width/2) -40, 20); // Corridor Supperior
-  rect (x +(width/2) +40, y -(height/2), (width/2) -40, 20); // Corridor Inferior
 }
